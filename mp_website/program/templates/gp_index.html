@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Graphical Method - Mathematical Programming{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Linear Programming Solver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .delete-button {
+            background-color: #FF0000;
+            margin-left: 10px;
+        }
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Linear Programming Solver</h1>
+        <form method="post">
+            {% csrf_token %}
+            <label for="objective_function">Objective Function (comma-separated coefficients):</label>
+            <input type="text" id="objective_function" name="objective_function" required>
+            
+            <h2>Constraints</h2>
+            <div id="constraints_container">
+                <div>
+                    <label>Constraint 1:</label>
+                    <input type="text" name="constraints[]" placeholder="Enter coefficients,<=bound" required>
+                </div>
+            </div>
+            
+            <button type="button" onclick="addConstraint()">Add Constraint</button>
+            <button type="submit">Solve</button>
+            <button type="button" class="delete-button" onclick="removeLastConstraint()">Delete Last Constraint</button>
+        </form>
+    </div>
+
+    <script>
+        function addConstraint() {
+            var container = document.getElementById("constraints_container");
+            var index = container.getElementsByTagName("div").length + 1;
+            var constraintDiv = document.createElement("div");
+            constraintDiv.innerHTML = '<label>Constraint ' + index + ':</label> <input type="text" name="constraints[]" placeholder="Enter coefficients,<=bound" required>';
+            container.appendChild(constraintDiv);
+        }
+
+        function removeLastConstraint() {
+            var container = document.getElementById("constraints_container");
+            if (container.children.length > 1) {
+                container.lastChild.remove();
+            } else {
+                alert("At least one constraint is required.");
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+{% endblock %}

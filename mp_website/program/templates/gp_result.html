@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Graphical Method - Mathematical Programming{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Linear Programming Result</title>
+</head>
+<body>
+    <h1>Optimal Solution</h1>
+    <p>Optimal Point: {{ optimal_point }}</p>
+    <p>Optimal Value: {{ optimal_value }}</p>
+    <img src="data:image/png;base64,{{ plot_uri }}" alt="Feasible Region and Optimal Solution"style="width: 60%; height: auto;">
+</body>
+</html>
+
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Transportation Problem Solver{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transportation Problem Solver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+        input, textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            color: #000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Transportation Problem Solver</h1>
+        <form id="transportation-form" method="post">
+            {% csrf_token %}
+            <label for="rows">Number of Rows (Sources):</label>
+            <input type="number" id="rows" name="rows" required>
+
+            <label for="columns">Number of Columns (Destinations):</label>
+            <input type="number" id="columns" name="columns" required>
+            
+            <button type="button" onclick="generateFields()">Generate Fields</button>
+        </form>
+
+        <form id="dynamic-form" method="post" style="display: none;">
+            {% csrf_token %}
+            <div id="dynamic-fields"></div>
+            <button type="submit">Solve</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function generateFields() {
+            var rows = document.getElementById("rows").value;
+            var columns = document.getElementById("columns").value;
+            var dynamicFields = document.getElementById("dynamic-fields");
+            dynamicFields.innerHTML = '';
+
+            // Cost Matrix
+            dynamicFields.innerHTML += '<label>Cost Matrix (comma-separated values for each row):</label>';
+            for (var i = 0; i < rows; i++) {
+                dynamicFields.innerHTML += '<textarea name="cost_matrix_row_' + i + '" rows="1" required></textarea>';
+            }
+
+            // Supply
+            dynamicFields.innerHTML += '<label>Supply (comma-separated values):</label>';
+            dynamicFields.innerHTML += '<textarea name="supply" rows="1" required></textarea>';
+
+            // Demand
+            dynamicFields.innerHTML += '<label>Demand (comma-separated values):</label>';
+            dynamicFields.innerHTML += '<textarea name="demand" rows="1" required></textarea>';
+
+            document.getElementById("dynamic-form").style.display = 'block';
+        }
+
+        document.getElementById("dynamic-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var formData = new FormData(event.target);
+            var costMatrix = [];
+            var rows = document.getElementById("rows").value;
+
+            for (var i = 0; i < rows; i++) {
+                var rowValues = formData.get("cost_matrix_row_" + i).split(',').map(Number);
+                costMatrix.push(rowValues);
+            }
+
+            var data = {
+                cost_matrix: costMatrix,
+                supply: formData.get("supply").split(',').map(Number),
+                demand: formData.get("demand").split(',').map(Number)
+            };
+
+            fetch("{% url 'transportation_problem' %}", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("result").innerText = "Error: " + data.error;
+                } else {
+                    var solutionTable = '<h2>Solution</h2><table><tr>';
+                    for (var i = 0; i < data.solution.length; i++) {
+                        solutionTable += '<tr>';
+                        for (var j = 0; j < data.solution[i].length; j++) {
+                            solutionTable += '<td>' + data.solution[i][j] + '</td>';
+                        }
+                        solutionTable += '</tr>';
+                    }
+                    solutionTable += '</table>';
+                    document.getElementById("result").innerHTML = solutionTable + '<h3>Total Cost</h3><pre>' + data.total_cost + '</pre><h4>Status</h4><pre>' + data.status + '</pre>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById("result").innerText = "An error occurred. Please try again.";
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Mathematical Programming{% endblock %}
+
+{% block content %}
+    <style>
+        .content {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        .icon {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        .icon:hover {
+            transform: scale(1.1);
+        }
+        .icon-circle {
+            width: 120px;
+            height: 120px;
+            background-color: #16a085;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2.5rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .icon:hover .icon-circle {
+            background-color: #1abc9c;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+        .icon-description {
+            color: #bdc3c7;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+    </style>
+
+    <div class="content">
+        <div class="icon-container">
+            <!-- Graphical Method -->
+            <a href="{% url 'graphical_method' %}" class="icon">
+                <div class="icon-circle">&#128202;</div>
+                <p class="icon-description">Graphical Method</p>
+            </a>
+
+            <!-- Simplex Method -->
+            <a href="{% url 'simplex_method' %}" class="icon">
+                <div class="icon-circle">&#177;</div>
+                <p class="icon-description">Simplex Method</p>
+            </a>
+
+            <!-- Transportation Problem -->
+            <a href="{% url 'transportation_problem' %}" class="icon">
+                <div class="icon-circle">&#128228;</div> <!-- Icon with numbers and symbols -->
+                <p class="icon-description">Transportation Problem</p>
+            </a>
+            </a>
+        </div>
+    </div>
+{% endblock %}
